@@ -13,6 +13,6 @@ RSpec.describe Bootscale::FileStorage do
   it "can dump binary" do
     hash = {"\xDE" => 'utf-8'}
     subject.dump(%w(foo), hash)
-    expect(subject.load(%w(foo))).to be == hash
+    expect(subject.load(%w(foo)).to_h).to be == hash
   end
 end

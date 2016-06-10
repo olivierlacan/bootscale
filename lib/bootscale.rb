@@ -3,17 +3,10 @@ require_relative 'bootscale/version'
 module Bootscale
   DOT_SO = '.so'.freeze
   DOT_RB = '.rb'.freeze
-  LEADING_SLASH = '/'.freeze
 
   class << self
     def [](path)
-      path = path.to_s
-      return if path.start_with?(LEADING_SLASH)
-      if path.end_with?(DOT_RB, DOT_SO)
-        @cache[path]
-      else
-        @cache["#{path}#{DOT_RB}"] || @cache["#{path}#{DOT_SO}"]
-      end
+      @cache[path]
     end
 
     def setup(options = {})
@@ -23,23 +16,23 @@ module Bootscale
     end
 
     def regenerate
-      @cache = load_cache || save_cache(cache_builder.generate($LOAD_PATH))
+      @cache = load_cache($LOAD_PATH) || save_cache(Cache.build($LOAD_PATH, entries))
     end
 
     private
 
-    def cache_builder
-      @cache_builder ||= CacheBuilder.new
+    def entries
+      @entries ||= {}
     end
 
-    def load_cache
+    def load_cache(load_path)
       return unless storage
-      storage.load($LOAD_PATH)
+      storage.load(load_path)
     end
 
     def save_cache(cache)
       return cache unless storage
-      storage.dump($LOAD_PATH, cache)
+      storage.dump(cache.load_path, cache)
       cache
     end
 
@@ -56,5 +49,4 @@ module Bootscale
   end
 end
 
-require_relative 'bootscale/entry'
-require_relative 'bootscale/cache_builder'
+require_relative 'bootscale/cache'

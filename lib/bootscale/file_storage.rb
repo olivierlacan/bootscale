@@ -8,13 +8,15 @@ module Bootscale
 
     def load(load_path)
       path = cache_path(load_path)
-      Serializer.load(File.read(path)) if File.exist?(path)
+      if File.exist?(path)
+        Cache.new(load_path, Serializer.load(File.read(path)))
+      end
     end
 
     def dump(load_path, cache)
       path = cache_path(load_path)
       FileUtils.mkdir_p(File.dirname(path))
-      File.write(path, Serializer.dump(cache), mode: 'wb+')
+      File.write(path, Serializer.dump(cache.to_h), mode: 'wb+')
     end
 
     private
