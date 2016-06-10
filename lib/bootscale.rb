@@ -16,7 +16,11 @@ module Bootscale
     end
 
     def regenerate
-      @cache = load_cache($LOAD_PATH) || save_cache(Cache.build($LOAD_PATH, entries))
+      @cache = generate_cache($LOAD_PATH)
+    end
+
+    def generate_cache(load_path)
+      load_cache(load_path) || save_cache(Cache.build(load_path, entries))
     end
 
     private
